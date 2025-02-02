@@ -1,0 +1,69 @@
+const int button[] = {2, 3, 4}; // adjust to {2, 3, 4, 5} if you have 4 buttons
+int ButtonState[] = {0, 0, 0}; // adjust to {0, 0, 0, 0} if you have 4 buttons
+int lastButtonState[] = {0, 0, 0}; // adjust to {0, 0, 0, 0} if you have 4 buttons
+int password[] = {1,2,3}; // adjust to {0, 1, 2, 3} if you have 4 buttons
+int level = 0;
+int green = 7;
+int red = 8;
+int buzzer = 9; // add a buzzer pin
+int servoPin = 10; // add a servo pin
+#include <Servo.h>
+Servo myServo; // create a servo object
+void setup() {
+pinMode(button[0], INPUT_PULLUP);
+pinMode(button[1], INPUT_PULLUP);
+pinMode(button[2], INPUT_PULLUP);
+pinMode(green, OUTPUT);
+pinMode(red, OUTPUT);
+pinMode(buzzer, OUTPUT); // add buzzer as an output
+myServo.attach(servoPin); // attach the servo to the pin
+level = 0;
+}
+void loop() {
+for (int i = 0; i < 3; i++) { // adjust to i < 4 if you have 4 buttons
+ButtonState[i] = digitalRead(button[i]);
+}
+for (int i = 0; i < 3; i++) { // adjust to i < 4 if you have 4 buttons
+if (ButtonState[i] != lastButtonState[i]) {
+if (ButtonState[i] == 1) {
+switch (level) {
+case 0:
+
+if (i == password[0]) level++;
+else level = 5;
+break;
+case 1:
+if (i == password[1]) level++;
+else level = 5;
+break;
+case 2:
+if (i == password[2]) level++;
+else level = 5;
+break;
+}
+}
+lastButtonState[i] = ButtonState[i];
+}
+}
+if (level == 3) {
+digitalWrite(green, HIGH);
+myServo.write(180); // open the servo (adjust the angle to your liking)
+delay(5000);
+digitalWrite(green, LOW);
+myServo.write(0); // close the servo (adjust the angle to your liking)
+level = 0;
+}
+if (level == 5) {
+for (int j = 0; j < 1; j++) {
+digitalWrite(red, HIGH);
+tone(buzzer, 1000); // add a 1kHz tone to the buzzer
+myServo.write(0); // close the servo (adjust the angle to your liking)
+delay(5000);
+digitalWrite(red, LOW);
+noTone(buzzer); // turn off the tone
+delay(20);
+}
+level = 0;
+}
+delay(20);
+}
